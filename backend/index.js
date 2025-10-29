@@ -3,6 +3,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 dotenv.config()
 import cookieParser from 'cookie-parser'
+import connectDB from './DB/conn.js'
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -13,8 +14,12 @@ app.use(cors({
     credentials:true
 }))
 
+//mongoDB connection
+
+connectDB();
+
 app.get('/',(req,res)=>{
-    res.send("helo")
+    res.send("helooooo guyjjjj")
 })
 
 app.listen(port,()=>{
