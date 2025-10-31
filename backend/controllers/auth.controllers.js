@@ -101,6 +101,10 @@ export const logout = async(req,res)=>{
 }
 
 //send verification otp to user's email
+// backend se frontend ko res me cookie milegi 
+//cookie me token hai aur usme user._id
+//we need a middleware function for this
+
 export const verificationOTP = async(req,res)=>{
     try {
         const {userId} = req.body;
@@ -131,6 +135,7 @@ export const verificationOTP = async(req,res)=>{
     }
 }
 
+//verify email address with entering otp
 export const verifyEmail = async(req,res)=>{
    try {
      const {userId,OTP} = req.body;
@@ -162,3 +167,4 @@ export const verifyEmail = async(req,res)=>{
 
    }
 }
+
