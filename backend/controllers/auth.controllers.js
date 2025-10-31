@@ -105,7 +105,7 @@ export const logout = async(req,res)=>{
 //cookie me token hai aur usme user._id
 //we need a middleware function for this
 
-export const verificationOTP = async(req,res)=>{
+export const sendVerificationOTP = async(req,res)=>{
     try {
         const {userId} = req.body;
         const user = await User.findById(userId);
@@ -168,3 +168,78 @@ export const verifyEmail = async(req,res)=>{
    }
 }
 
+//check if user is authenticated
+// we will run the middleware first , if the middlewae executes (has token in cookie) user is authenticated 
+
+export const isAuthenticated = async(req,res)=>{
+    try {
+        
+        return res.json({message:"user authenticated",success:true})
+    } catch (error) {
+        res.json({success:false,message:error.message})
+    }
+}
+
+//send pass reset otp
+export const sendResetOtp = async(req,res)=>{
+   try {
+      const {email} = req.body;
+      const user =await User.findOne({email})
+
+      if(!user){
+         return res.json({message:"no user exist",success:false})
+      }
+      
+      const OTP = String(Math.floor(   100000 + Math.random()*900000))
+      user.resetOtp=OTP
+      user.resetOtpExpireAt=Date.now() + 24*60*60*1000
+
+      const mailOptions = {
+         from : process.env.SENDER_EMAIL,
+         to:user.email,
+         subject:"pass reset otp",
+         text:`your password reset otp for DakshDev account is : ${OTP}`
+      }
+
+      await transporter.sendMail(mailOptions);
+      
+
+      await user.save();
+      res.status(200).json({message:"sent pass reset otp",success:true})
+
+   } catch (error) {
+      return res.json({message:"err in sending pass reset otp",success:false})
+   }
+}
+
+//verify pass reset otp, and reset password
+export const resetPass = async(req,res)=>{
+    try {
+        const {email,OTP,newpass} = req.body;
+
+        if(!email || !OTP || ! newpass){
+            return res.json({message:"email, otp and new pass is required",success:false})
+        }
+        const user = await User.findOne({email})
+
+        if(!user){
+            return res.json({message:"user not found to reset pass",success:false})
+        }
+
+        if(OTP=='' || OTP!=user.resetOtp){
+            return res.json({message:"invalid otp for reseting pass",success:false})
+        }
+        if(user.resetOtpExpireAt<Date.now()){
+            return res.json({message:"pass reset otp expired",success:false})
+        }
+
+        const hashedPass = bcrypt.hashSync(newpass,10)
+        user.password = hashedPass;
+        user.resetOtp='',
+        await user.save()
+        res.json({message:"password reset",success:true})
+
+    } catch (error) {
+        res.json({message:"cant reset pass",success:false})
+    }
+}
