@@ -6,7 +6,7 @@ dotenv.config()
 import cookieParser from 'cookie-parser'
 import connectDB from './DB/conn.js'
 import authRouter from './routes/auth.routes.js'
-
+import userRouter from './routes/user.routes.js'
 
 
 const app = express()
@@ -26,6 +26,7 @@ connectDB();
 
 //api endpoints
 app.use('/api/auth',authRouter)
+app.use('/api/user',userRouter)
 
 app.get('/',(req,res)=>{
     res.send("helooooo guyjjjj")
