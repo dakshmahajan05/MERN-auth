@@ -9,20 +9,23 @@ import axios from 'axios'
 const  Login = () => {
 
     const {backendUrl} = useContext(AppContext)
-    const {isLoggedIn,setIsLoggedIn} = useContext(AppContext)
+    const {isLoggedIn,setIsLoggedIn,getuserdata} = useContext(AppContext)
+
 
    const onsubmithandler = async(e)=>{
   e.preventDefault();
   try {
     axios.defaults.withCredentials=true
-    const {email, fullname, password} = formdata;
+    const {email, name, password} = formdata;
 
     if(state === 'signup'){
-      const {data} = await axios.post(`${backendUrl}/api/auth/register`, { fullname,email, password })
+      const {data} = await axios.post(`${backendUrl}/api/auth/register`, { name,email, password })
 
       if(data.success){
         setIsLoggedIn(true)
+        await getuserdata()
         navigate('/')
+
       }else{
         toast.error(data.message)
       }
@@ -31,6 +34,7 @@ const  Login = () => {
 
       if(data.success){
         setIsLoggedIn(true)
+        await getuserdata();
         navigate('/')
       }else{
         toast.error(data.message)
@@ -48,7 +52,7 @@ const  Login = () => {
     const [state,setstate] = useState('signup')
     const [formdata,setformdata] = useState({
         'email':'',
-        'fullname':'',
+        'name':'',
         'password':''
     })
     const handlechange = (e)=>{
@@ -65,7 +69,7 @@ const  Login = () => {
             <form onSubmit={onsubmithandler} action="">
                 <div className='flex flex-col items-center gap-3'>
                     {state==='signup' && (
-                <input onChange={handlechange} name='fullname' value={formdata.fullname} className='bg-gray-600 mx-2 py-3 px-4 text-white  rounded-2xl' type="text" placeholder='Full Name' />
+                <input onChange={handlechange} name='name' value={formdata.name} className='bg-gray-600 mx-2 py-3 px-4 text-white  rounded-2xl' type="text" placeholder='Full Name' />
 
                     )}
                 <input onChange={handlechange} name='email' value={formdata.email} className='bg-gray-600 mx-2  py-3 px-4 text-white rounded-2xl' type="text" placeholder='Email' />

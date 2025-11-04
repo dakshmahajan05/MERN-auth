@@ -13,7 +13,8 @@ const userAuth = async(req,res,next)=>{
      const decodedToken = jwt.verify(token,process.env.JWT_SECRET)
 
      if(decodedToken.id){
-        req.body.userId=decodedToken.id;
+      // req.body.userId=decodedToken.id;
+      req.user = decodedToken;
      }else{
         return res.json({success:false,message:"not authorised"})
      }
